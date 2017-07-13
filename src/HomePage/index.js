@@ -12,6 +12,7 @@ import uuid from 'uuid/v4';
 SQLite.enablePromise(true);
 
 const NUM_TOTAL_MESSAGES = 2000;
+const RANDOM_USER_COUNT = 500;
 
 const styles = StyleSheet.create({
   container: {
@@ -37,19 +38,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f9c99f'
+  },
+  openChatButton: {
+    height: 50,
+    width: 120,
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#c6a0ff'
   }
 });
 
 export default class HomePage extends Component {
   static navigationOptions = {
-    header: null
+    header: null,
+    headerBackTitle: 'Home'
   };
 
   async componentDidMount() {
     try {
-      this.db = await SQLite.openDatabase({ name: 'test.db' });
-      await this.db.executeSql('CREATE TABLE IF NOT EXISTS `chat` ( `id` TEXT, `message` TEXT, `senderName` TEXT, `senderPicture` TEXT, PRIMARY KEY(`id`) );');
-      const numChatsResult = await this.db.executeSql('select count(*) as numChats from chat;');
+      window.db = await SQLite.openDatabase({ name: 'test.db' });
+      // await window.db.executeSql('DROP TABLE IF EXISTS chat;');
+      await window.db.executeSql('CREATE TABLE IF NOT EXISTS "chat" ( `id` TEXT, `message` TEXT, `senderName` TEXT, `senderPicture` TEXT, `senderId` TEXT, `messageDate` INTEGER, PRIMARY KEY(`id`) )');
+      const numChatsResult = await window.db.executeSql('select count(*) as numChats from chat;');
       const numChats = numChatsResult[0].rows.item(0).numChats;
       if (numChats < NUM_TOTAL_MESSAGES) {
         this.populateDatabase();
@@ -59,27 +70,42 @@ export default class HomePage extends Component {
     }
   }
 
-  getRandomNumber = (min, max) => Math.floor(Math.random() * max) + min
+  getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min)) + min
+
+  openChatScreen = () => {
+    const { navigate } = this.props.navigation;
+    navigate('Chats');
+  }
 
   populateDatabase = async () => {
     try {
       console.log('starting populatedb');
-      await this.db.executeSql('delete from chat;');
-      const response = await fetch('https://randomuser.me/api/?results=1000&inc=name,id,picture');
+      await window.db.executeSql('delete from chat;');
+
+      const response = await fetch(`https://randomuser.me/api/?results=${RANDOM_USER_COUNT}&inc=name,picture`);
       if (response.status < 200 || response.status >= 300) {
         throw new Error('Got repsonse with status code: ' + response.status);
       }
       setTimeout(() => null, 0); // workaround for #issue-6679
       const responseObject = await response.json();
       const randomUsers = responseObject.results;
+      console.log('randomUsers are', randomUsers);
+
+      const maxDate = new Date().getTime();
+      const monthMillis = 30 * 24 * 60 * 60 * 1000;
+      const minDate = maxDate - monthMillis;
+
       for (let index = 0; index < NUM_TOTAL_MESSAGES; index += 1) {
-        const randomUser = randomUsers[this.getRandomNumber(0, 1000)];
+        const randomUser = randomUsers[this.getRandomNumber(0, RANDOM_USER_COUNT)];
         const id = uuid();
+        const senderId = randomUser.id || uuid();
+        randomUser.id = senderId;
         const senderName = `${randomUser.name.first} ${randomUser.name.last}`;
         const senderPicture = randomUser.picture.medium;
         const numberOfWords = this.getRandomNumber(10, 100);
         const message = loremIpsum({ count: numberOfWords, units: 'words' });
-        await this.db.executeSql('insert into chat (id, message, senderName, senderPicture) values (?, ?, ?, ?)', [id, message, senderName, senderPicture]);
+        const messageDate = this.getRandomNumber(minDate, maxDate);
+        await window.db.executeSql('insert into chat (id, message, senderName, senderPicture, senderId, messageDate) values (?, ?, ?, ?, ?, ?)', [id, message, senderName, senderPicture, senderId, messageDate]);
       }
       console.log('chats added successfully');
     } catch (error) {
@@ -102,6 +128,9 @@ export default class HomePage extends Component {
         </Text>
         <TouchableOpacity style={styles.populateDBButton} onPress={this.populateDatabase}>
           <Text>Repopulate Database</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.openChatButton} onPress={this.openChatScreen}>
+          <Text>Open Chats</Text>
         </TouchableOpacity>
       </View>
     );
