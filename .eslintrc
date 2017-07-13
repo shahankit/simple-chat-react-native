@@ -1,0 +1,42 @@
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "comma-dangle": 0,
+    "eqeqeq": [2, "allow-null"],
+    "id-length": 0,
+    "strict": ["error", "global"],
+    "no-unused-expressions": [2, { "allowShortCircuit": true, "allowTernary": true }],
+    "prefer-template": 0,
+    "radix": 0,
+    "no-nested-ternary": 0,
+    "max-len": ["error", 200, 2, { "ignoreUrls": true }],
+    "no-param-reassign": [2, { "props": false }],
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    // eslint-plugin-react
+    "react/jsx-boolean-value": [1, "always"],
+    "react/prop-types": 0,
+    "react/prefer-stateless-function": 0,
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    // eslint-plugin-react-native
+    "react-native/no-unused-styles": 2
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "ecmaFeatures": {
+    "jsx": true,
+    "experimentalObjectRestSpread": true,
+    "experimentalDecorators": true,
+    "modules": false
+  },
+  "plugins": [
+    "react",
+    "react-native"
+  ]
+}

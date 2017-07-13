@@ -11,25 +11,7 @@ import {
   Text,
   View
 } from 'react-native';
-
-export default class MyChat extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
-    );
-  }
-}
+import SQLite from 'react-native-sqlite-storage';
 
 const styles = StyleSheet.create({
   container: {
@@ -49,5 +31,29 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
+export default class MyChat extends Component {
+  async componentDidMount() {
+    const db = await SQLite.openDatabase({ name: 'test.db' });
+    await db.executeSql('CREATE TABLE IF NOT EXISTS `chat` ( `id` TEXT, `message` TEXT, `senderName` TEXT, `senderPicture` TEXT, PRIMARY KEY(`id`) );');
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>
+          Welcome to React Native!
+        </Text>
+        <Text style={styles.instructions}>
+          To get started, edit index.ios.js
+        </Text>
+        <Text style={styles.instructions}>
+          Press Cmd+R to reload,{'\n'}
+          Cmd+D or shake for dev menu
+        </Text>
+      </View>
+    );
+  }
+}
 
 AppRegistry.registerComponent('MyChat', () => MyChat);
