@@ -3,7 +3,8 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import SQLite from 'react-native-sqlite-storage';
 import loremIpsum from 'lorem-ipsum-react-native';
@@ -33,11 +34,12 @@ const styles = StyleSheet.create({
   },
   populateDBButton: {
     height: 50,
-    width: 180,
+    width: 200,
     marginTop: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f9c99f'
+    backgroundColor: '#f9c99f',
+    flexDirection: 'row',
   },
   openChatButton: {
     height: 50,
@@ -46,13 +48,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#c6a0ff'
-  }
+  },
+  populatingLoaderContainer: {
+    marginLeft: 10
+  },
 });
 
 export default class HomePage extends Component {
   static navigationOptions = {
     header: null,
     headerBackTitle: 'Home'
+  };
+
+  state = {
+    isPopulating: false
   };
 
   async componentDidMount() {
@@ -77,8 +86,17 @@ export default class HomePage extends Component {
     navigate('Chats');
   }
 
+  repopulateDatabase = () => {
+    if (this.state.isPopulating) {
+      return;
+    }
+
+    this.populateDatabase();
+  }
+
   populateDatabase = async () => {
     try {
+      this.setState({ isPopulating: true });
       console.log('starting populatedb');
       await window.db.executeSql('delete from chat;');
 
@@ -111,6 +129,19 @@ export default class HomePage extends Component {
     } catch (error) {
       console.log('Error in populatedb', error);
     }
+    this.setState({ isPopulating: false });
+  }
+
+  renderPopulatingLoader = () => {
+    if (!this.state.isPopulating) {
+      return null;
+    }
+
+    return (
+      <View style={styles.populatingLoaderContainer}>
+        <ActivityIndicator />
+      </View>
+    );
   }
 
   render() {
@@ -126,8 +157,9 @@ export default class HomePage extends Component {
           Press Cmd+R to reload,{'\n'}
           Cmd+D or shake for dev menu
         </Text>
-        <TouchableOpacity style={styles.populateDBButton} onPress={this.populateDatabase}>
-          <Text>Repopulate Database</Text>
+        <TouchableOpacity style={styles.populateDBButton} onPress={this.repopulateDatabase}>
+          <Text>Repopulat{this.state.isPopulating ? 'ing' : 'e'} Database</Text>
+          {this.renderPopulatingLoader()}
         </TouchableOpacity>
         <TouchableOpacity style={styles.openChatButton} onPress={this.openChatScreen}>
           <Text>Open Chats</Text>
