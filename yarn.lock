@@ -3085,6 +3085,18 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.3.1:
   dependencies:
     js-tokens "^3.0.0"
 
+lorem-ipsum-react-native@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/lorem-ipsum-react-native/-/lorem-ipsum-react-native-1.0.3.tgz#967d821e5ebf135e13e5eb386e6045c70ab4119c"
+  dependencies:
+    optimist "~0.3.5"
+
+lorem-ipsum@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/lorem-ipsum/-/lorem-ipsum-1.0.4.tgz#30b72a3b1e191f55062af8c7dfab291ae4fbd912"
+  dependencies:
+    optimist "~0.3.5"
+
 lru-cache@^4.0.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-4.1.1.tgz#622e32e82488b49279114a4f9ecf45e7cd6bba55"
@@ -3410,6 +3422,12 @@ optimist@^0.6.1:
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
   dependencies:
     minimist "~0.0.1"
+    wordwrap "~0.0.2"
+
+optimist@~0.3.5:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.3.7.tgz#c90941ad59e4273328923074d2cf2e7cbc6ec0d9"
+  dependencies:
     wordwrap "~0.0.2"
 
 optionator@^0.8.1, optionator@^0.8.2:
@@ -4560,7 +4578,7 @@ uuid@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.1.tgz#6544bba2dfda8c1cf17e629a3a305e2bb1fee6c1"
 
-uuid@^3.0.0:
+uuid@^3.0.0, uuid@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
 
