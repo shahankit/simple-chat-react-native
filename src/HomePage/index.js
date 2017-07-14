@@ -66,7 +66,11 @@ export default class HomePage extends Component {
 
   async componentDidMount() {
     try {
+      console.log('component did mount called');
+      console.log('calling sqlite openDatabase', SQLite.openDatabase);
       window.db = await SQLite.openDatabase({ name: 'test.db' });
+      console.log('open database successful');
+      console.log('window.db is', window.db);
       // await window.db.executeSql('DROP TABLE IF EXISTS chat;');
       await window.db.executeSql('CREATE TABLE IF NOT EXISTS "chat" ( `id` TEXT, `message` TEXT, `senderName` TEXT, `senderPicture` TEXT, `senderId` TEXT, `messageDate` INTEGER, PRIMARY KEY(`id`) )');
       const numChatsResult = await window.db.executeSql('select count(*) as numChats from chat;');
