@@ -15,20 +15,47 @@ export default class ChatsPage extends Component {
 
   async componentDidMount() {
     try {
-      const mostOccuringUserResult = await window.db.executeSql('select senderId, count(senderId) as freq from chat group by senderId order by freq desc limit 1;');
-      const userId = mostOccuringUserResult[0].rows.item(0).senderId;
-      this.currentUserId = userId;
+      const mostOccuringUserResult = await window.db.executeSql(
+        'select senderId, count(senderId) as freq from chat group by senderId order by freq desc limit 1;'
+      );
+      const currentUser = mostOccuringUserResult[0].rows.item(0);
+      console.log('currentUser is', currentUser);
+      this.currentUser = currentUser;
       this.fetchMessages();
     } catch (error) {
       console.log('Error in componentDidMount', error);
     }
   }
 
+  onSend = async (messages) => {
+    await Promise.all(
+      messages.map(message =>
+        window.db.executeSql(
+          'insert into chat (id, message, senderName, senderPicture, senderId, messageDate) values (?, ?, ?, ?, ?, ?)',
+          [
+            message._id,
+            message.text,
+            this.currentUser.senderName,
+            this.currentUser.senderPicture,
+            this.currentUser.senderId,
+            message.createdAt.getTime()
+          ]
+        )
+      )
+    );
+    this.setState({
+      messages: messages.concat(this.state.messages)
+    });
+  };
+
   fetchMessages = async () => {
     try {
       this.setState({ isFetching: true });
       const currentNumMessages = this.state.messages.length;
-      const chatMessagesResult = await window.db.executeSql('select * from chat order by messageDate desc limit ? offset ?', [BATCH_SIZE, currentNumMessages]);
+      const chatMessagesResult = await window.db.executeSql(
+        'select * from chat order by messageDate desc limit ? offset ?',
+        [BATCH_SIZE, currentNumMessages]
+      );
       const numChatMessages = chatMessagesResult[0].rows.length;
       const messageObjects = [];
       const getChatMessage = chatMessagesResult[0].rows.item;
@@ -41,8 +68,8 @@ export default class ChatsPage extends Component {
           user: {
             _id: chatMessage.senderId,
             name: chatMessage.senderName,
-            avatar: chatMessage.senderPicture,
-          },
+            avatar: chatMessage.senderPicture
+          }
         });
       }
       this.setState({
@@ -52,16 +79,17 @@ export default class ChatsPage extends Component {
     } catch (error) {
       console.log('Error in fetchMessages', error);
     }
-  }
+  };
 
   render() {
     return (
       <GiftedChat
         messages={this.state.messages}
-        user={{ _id: this.currentUserId }}
+        user={{ _id: this.currentUser && this.currentUser.senderId }}
         loadEarlier={true}
         onLoadEarlier={this.fetchMessages}
         isLoadingEarlier={this.state.isFetching}
+        onSend={this.onSend}
       />
     );
   }
