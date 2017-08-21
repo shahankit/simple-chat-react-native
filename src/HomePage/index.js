@@ -15,7 +15,7 @@ import uuid from 'uuid/v4';
 
 SQLite.enablePromise(true);
 
-const DEFAULT_MESSAGE_COUNT = 20;
+const DEFAULT_MESSAGE_COUNT = 200;
 const TEXT_MESSAGE_PERCENTAGE = 70;
 
 const styles = StyleSheet.create({
@@ -258,6 +258,7 @@ export default class HomePage extends Component {
               style={styles.messageCountInput}
               keyboardType={'numeric'}
               maxLength={4}
+              underlineColorAndroid={'rgba(0, 0, 0, 0)'}
             />
           </View>
           <TouchableOpacity style={styles.populateDBButton} onPress={this.repopulateDatabase}>
