@@ -16,7 +16,7 @@ export default class ChatsPage extends Component {
   async componentDidMount() {
     try {
       const mostOccuringUserResult = await window.db.executeSql(
-        'select senderId, count(senderId) as freq from chat group by senderId order by freq desc limit 1;'
+        'select senderId, senderName, senderPicture, count(senderId) as freq from chat group by senderId order by freq desc limit 1;'
       );
       const currentUser = mostOccuringUserResult[0].rows.item(0);
       console.log('currentUser is', currentUser);
@@ -31,9 +31,18 @@ export default class ChatsPage extends Component {
     await Promise.all(
       messages.map(message =>
         window.db.executeSql(
-          'insert into chat (id, message, senderName, senderPicture, senderId, messageDate) values (?, ?, ?, ?, ?, ?)',
+          `insert into chat (
+            id,
+            messageType,
+            messageText,
+            senderName,
+            senderPicture,
+            senderId,
+            messageDate
+          ) values (?, ?, ?, ?, ?, ?, ?)`,
           [
             message._id,
+            'text',
             message.text,
             this.currentUser.senderName,
             this.currentUser.senderPicture,
