@@ -61,9 +61,11 @@ export default class ChatsPage extends Component {
       const getChatMessage = chatMessagesResult[0].rows.item;
       for (let index = 0; index < numChatMessages; index += 1) {
         const chatMessage = getChatMessage(index);
+        const messageNumber = currentNumMessages + index;
         messageObjects.push({
           _id: chatMessage.id,
-          text: chatMessage.message,
+          text: chatMessage.messageType === 'image' ? messageNumber.toString() : `${messageNumber}\n${chatMessage.messageText}`,
+          image: chatMessage.messageImage,
           createdAt: new Date(chatMessage.messageDate),
           user: {
             _id: chatMessage.senderId,
